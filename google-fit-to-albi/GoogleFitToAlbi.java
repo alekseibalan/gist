@@ -4,8 +4,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.OffsetDateTime;
 import java.time.OffsetTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -14,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -48,8 +45,8 @@ public class GoogleFitToAlbi implements BiConsumer<LocalDate, List<String>> {
       String dataSystolic = line.get(indexSystolic);
       String dataDiastolic = line.get(indexDiastolic);
       String dataWeight = line.get(indexWeight);
-      assert !dataSystolic.isEmpty() ^ dataDiastolic.isEmpty();
-      if (!dataSystolic.isEmpty()) {
+      if (!dataSystolic.isEmpty() || !dataDiastolic.isEmpty()) {
+        assert !dataSystolic.isEmpty() && !dataDiastolic.isEmpty();
         double systolic = Double.parseDouble(dataSystolic);
         double diastolic = Double.parseDouble(dataDiastolic);
         result.add(String.format("Blood Pressure,%s,%s,%.0f,%.0f,mmHg,,", date, time, systolic, diastolic));
@@ -69,8 +66,8 @@ public class GoogleFitToAlbi implements BiConsumer<LocalDate, List<String>> {
       Matcher matcher = pattern.matcher(file);
       if (!matcher.matches()) continue;
       int year = Integer.parseInt(matcher.group(1));
-      LocalDate localDate = LocalDate.of(year, Integer.parseInt(matcher.group(2)),
-          Integer.parseInt(matcher.group(3)));
+      int month = Integer.parseInt(matcher.group(2));
+      LocalDate localDate = LocalDate.of(year, month, Integer.parseInt(matcher.group(3)));
       accept(localDate, Files.readAllLines(folder.resolve(file)));
     }
     return result;
