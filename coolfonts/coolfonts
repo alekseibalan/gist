@@ -1,0 +1,50 @@
+#!/bin/zsh
+
+# Copyright (C) 2026 Aleksei Balan
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+fonts="/usr/local/share/fonts/cool"
+if [ -d "$fonts" ]; then
+  echo "sudo rm -r $fonts"
+  exit 1
+fi
+if [ -n "$(ls)" ]; then
+  echo "the current folder is not empty"
+  exit 1
+fi
+echo "Fonts are subject to license agreements."
+echo -n "Please make sure you comply with the terms. [enter] "
+read -r -s
+echo
+sudo mkdir -p $fonts
+
+# SF Mono
+curl -O https://devimages-cdn.apple.com/design/resources/download/SF-Mono.dmg
+7z x SF-Mono.dmg
+rm SF-Mono.dmg
+7z x SFMonoFonts/SF\ Mono\ Fonts.pkg
+rm -r Resources
+rm -r SFMonoFonts
+rm Distribution
+rm \[TOC\].xml
+gunzip -c SFMonoFonts.pkg/Payload | cpio -im
+rm -r SFMonoFonts.pkg
+sudo cp --preserve=timestamps Library/Fonts/*.otf $fonts
+rm -r Library
+
+# fonts.dir
+sudo sh -c "cd $fonts;chmod a-x *;mkfontdir"
+xset fp+ $fonts
+fc-list | grep $fonts
