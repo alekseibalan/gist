@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/sh
 
 # Copyright (C) 2026 Aleksei Balan
 #
@@ -15,9 +15,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+windows="/mnt/windows"
 fonts="/usr/local/share/fonts/cool"
 if [ -d "$fonts" ]; then
   echo "sudo rm -r $fonts"
+  exit 1
+fi
+if [ ! -d "$windows/Windows/Fonts" ]; then
+  echo "the windows file system is not mounted"
   exit 1
 fi
 if [ -n "$(ls)" ]; then
@@ -29,6 +34,49 @@ echo -n "Please make sure you comply with the terms. [enter] "
 read -r -s
 echo
 sudo mkdir -p $fonts
+
+# Ubuntu Mono
+curl -LO https://github.com/canonical/Ubuntu-Sans-Mono-fonts/archive/refs/heads/main.zip
+unzip main.zip
+rm main.zip
+sudo cp --preserve=timestamps Ubuntu-Sans-Mono-fonts-main/fonts/ttf/*.ttf $fonts
+rm -r Ubuntu-Sans-Mono-fonts-main
+
+# Hack
+curl -LO https://github.com/source-foundry/Hack/releases/download/v3.003/Hack-v3.003-ttf.zip
+unzip Hack-v3.003-ttf.zip
+rm Hack-v3.003-ttf.zip
+sudo cp --preserve=timestamps ttf/Hack-*.ttf $fonts
+rm -r ttf
+
+# IBM Plex Mono
+curl -LO https://github.com/IBM/plex/releases/download/%40ibm%2Fplex-mono%402.5.0/ibm-plex-mono.zip
+unzip ibm-plex-mono.zip
+rm ibm-plex-mono.zip
+sudo cp --preserve=timestamps ibm-plex-mono/fonts/complete/ttf/IBMPlexMono-*.ttf $fonts
+rm -r ibm-plex-mono
+
+# Monaspace Radon - for people of culture
+curl -LO https://github.com/githubnext/monaspace/releases/download/v1.400/monaspace-static-v1.400.zip
+unzip monaspace-static-v1.400.zip
+rm monaspace-static-v1.400.zip
+for name in Neon Argon Krypton Xenon Radon; do
+  rm "Static Fonts/Monaspace $name/Monaspace$name-"*Wide*.otf
+  rm "Static Fonts/Monaspace $name/Monaspace$name-Extra"*.otf
+  sudo cp --preserve=timestamps "Static Fonts/Monaspace $name/Monaspace$name-"*.otf $fonts
+done
+rm -r Static\ Fonts
+
+# Segoe UI, Consolas, Cascadia Code
+sudo cp --preserve=timestamps $windows/Windows/Fonts/segoeui*.ttf $fonts
+sudo cp --preserve=timestamps $windows/Windows/Fonts/consola*.ttf $fonts
+curl -LO https://github.com/microsoft/cascadia-code/releases/download/v2407.24/CascadiaCode-2407.24.zip
+unzip CascadiaCode-2407.24.zip
+rm CascadiaCode-2407.24.zip
+rm -r otf
+rm -r woff2
+sudo cp --preserve=timestamps ttf/static/CascadiaMono-*.ttf $fonts
+rm -r ttf
 
 # SF Mono
 curl -O https://devimages-cdn.apple.com/design/resources/download/SF-Mono.dmg
@@ -45,6 +93,6 @@ sudo cp --preserve=timestamps Library/Fonts/*.otf $fonts
 rm -r Library
 
 # fonts.dir
-sudo sh -c "cd $fonts;chmod a-x *;mkfontdir"
-xset fp+ $fonts
-fc-list | grep $fonts
+#sudo sh -c "cd $fonts;chmod a-x *;mkfontdir"
+#xset fp+ $fonts
+fc-list : file family | grep $fonts | sort
