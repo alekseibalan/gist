@@ -15,14 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-windows="/mnt/windows"
 fonts="/usr/local/share/fonts/cool"
 if [ -d "$fonts" ]; then
   echo "sudo rm -r $fonts"
-  exit 1
-fi
-if [ ! -d "$windows/Windows/Fonts" ]; then
-  echo "the windows file system is not mounted"
   exit 1
 fi
 if [ -n "$(ls)" ]; then
@@ -67,9 +62,7 @@ for name in Neon Argon Krypton Xenon Radon; do
 done
 rm -r Static\ Fonts
 
-# Segoe UI, Consolas, Cascadia Code
-sudo cp --preserve=timestamps $windows/Windows/Fonts/segoeui*.ttf $fonts
-sudo cp --preserve=timestamps $windows/Windows/Fonts/consola*.ttf $fonts
+# Cascadia Code
 curl -LO https://github.com/microsoft/cascadia-code/releases/download/v2407.24/CascadiaCode-2407.24.zip
 unzip CascadiaCode-2407.24.zip
 rm CascadiaCode-2407.24.zip

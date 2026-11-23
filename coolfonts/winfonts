@@ -1,0 +1,41 @@
+#!/bin/sh
+
+# Copyright (C) 2026 Aleksei Balan
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+windows="/mnt/windows"
+fonts="/usr/local/share/fonts/win"
+if [ -d "$fonts" ]; then
+  echo "sudo rm -r $fonts"
+  exit 1
+fi
+if [ ! -d "$windows/Windows/Fonts" ]; then
+  echo "the windows file system is not mounted"
+  exit 1
+fi
+echo "Fonts are subject to license agreements."
+echo -n "Please make sure you comply with the terms. [enter] "
+read -r -s
+echo
+sudo mkdir -p $fonts
+
+# Segoe UI, Consolas, etc
+sudo cp --preserve=timestamps $windows/Windows/Fonts/segoeui*.ttf $fonts
+sudo cp --preserve=timestamps $windows/Windows/Fonts/consola*.ttf $fonts
+#sudo cp --preserve=timestamps $windows/Windows/Fonts/*.ttf $fonts
+sudo cp --preserve=timestamps $windows/Windows/Fonts/calibri*.ttf $fonts
+
+# fonts.dir
+fc-list : file family | grep $fonts | sort
